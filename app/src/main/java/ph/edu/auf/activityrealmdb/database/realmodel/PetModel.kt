@@ -10,4 +10,5 @@ class PetModel : RealmObject {
     var name: String = ""
     var petType: String = ""
     var age: Int = 0
+    var icon: String = "🐾"
 }

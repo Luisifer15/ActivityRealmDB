@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "ActivityRealMDB"
+rootProject.name = "ActivityRealmDB"
 include(":app")
  
