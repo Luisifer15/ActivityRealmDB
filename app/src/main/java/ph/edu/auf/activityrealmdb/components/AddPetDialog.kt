@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -70,6 +69,7 @@ fun AddPetDialog(
     var hasOwner by remember { mutableStateOf(false) }
     var isOwnerNew by remember { mutableStateOf(false) }
 
+    var originalOwnerName by remember { mutableStateOf("") }
     var ownerName by remember { mutableStateOf("") }
     var ownerNameError by remember { mutableStateOf<String?>(null) }
 
@@ -82,19 +82,28 @@ fun AddPetDialog(
         RealmHelper.getRealmInstance().query<OwnerModel>().find().map { it.name }
     }
 
-    if (pet != null) {
-        val owner = runBlocking {
-            RealmHelper.getRealmInstance().query<OwnerModel>("pets.id == $0", pet.id).first().find()
-        }
-        if (owner != null) {
-            hasOwner = true
-            ownerName = owner.name
-            isOwnerNew = false
+    LaunchedEffect(pet) {
+        if (pet != null) {
+            val owner = runBlocking {
+                RealmHelper.getRealmInstance().query<OwnerModel>("pets.id == $0", pet.id).first().find()
+            }
+            if (owner != null) {
+                hasOwner = true
+                originalOwnerName = owner.name
+                ownerName = owner.name
+                isOwnerNew = false
+            }
+        } else {
+            hasOwner = false
+            ownerName = ""
         }
     }
 
     LaunchedEffect(isOwnerNew) {
-        ownerName = ""
+        if (isOwnerNew) {
+            ownerNameError = "Enter owner name"
+            ownerName = ""
+        }
     }
 
     fun validateName(value: String): String? {
@@ -169,6 +178,7 @@ fun AddPetDialog(
                 )
 
                 OutlinedTextField(
+                    singleLine = true,
                     value = name,
                     onValueChange = {
                         name = it
@@ -201,6 +211,7 @@ fun AddPetDialog(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 OutlinedTextField(
+                    singleLine = true,
                     value = age,
                     onValueChange = {
                         age = it
@@ -346,7 +357,7 @@ fun AddPetDialog(
                     )
                     Text(
                         "HAS OWNER",
-                        style = TextStyle(
+                            style = TextStyle(
                             fontWeight = FontWeight.Bold,
                             fontSize = 14.sp
                         )
@@ -369,6 +380,12 @@ fun AddPetDialog(
                                 isOwnerNew = it
                                 ownerNameError = if (ownerName.isNotEmpty())
                                     validateOwnerName(ownerName) else null
+                                if (isOwnerNew){
+                                    originalOwnerName = ownerName
+                                    ownerName = ""
+                                } else {
+                                    ownerName = originalOwnerName
+                                }
                             },
                             colors = CheckboxDefaults.colors(
                                 checkedColor = brutalistAccent,
@@ -388,6 +405,7 @@ fun AddPetDialog(
 
                     if (isOwnerNew) {
                         OutlinedTextField(
+                            singleLine = true,
                             value = ownerName,
                             onValueChange = {
                                 ownerName = it
@@ -422,6 +440,7 @@ fun AddPetDialog(
                             onExpandedChange = { ownerExpanded = !ownerExpanded }
                         ) {
                             OutlinedTextField(
+                                singleLine = true,
                                 value = ownerName,
                                 onValueChange = { },
                                 label = { Text("OWNER NAME", fontWeight = FontWeight.Bold) },

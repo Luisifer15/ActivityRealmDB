@@ -57,8 +57,6 @@ fun PetScreen(petViewModel: PetViewModel = viewModel()) {
     var showDialog by remember { mutableStateOf(false) }
     var petToEdit by remember { mutableStateOf<PetModel?>(null) }
 
-    // Brutalist custom colors
-
 
     LaunchedEffect(petViewModel.showSnackbar) {
         petViewModel.showSnackbar.collect { message ->
@@ -109,6 +107,7 @@ fun PetScreen(petViewModel: PetViewModel = viewModel()) {
                     .padding(16.dp)
             ) {
                 OutlinedTextField(
+                    singleLine = true,
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
                     label = { Text("SEARCH PETS", fontWeight = FontWeight.Bold) },

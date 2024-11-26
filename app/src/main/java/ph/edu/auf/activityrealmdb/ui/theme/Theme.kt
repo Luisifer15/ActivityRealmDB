@@ -50,7 +50,7 @@ fun RealmDiscussionTheme(
     }
 
     MaterialTheme(
-        colorScheme = colorScheme,
+        colorScheme = lightColorScheme(),
         typography = Typography,
         content = content
     )
